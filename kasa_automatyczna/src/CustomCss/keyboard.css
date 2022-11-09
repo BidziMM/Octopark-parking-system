@@ -1,0 +1,8 @@
+.simple-keyboard .hg-button.hg-functionBtn.hg-button-space {
+    min-width: 150px;
+    max-width: none;
+  }
+  
+.simple-keyboard .hg-button.hg-functionBtn.hg-button-ent {
+    max-width: 20%;
+}
