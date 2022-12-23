@@ -33,7 +33,7 @@ const saveDataLocally = (data) => {
 }
 
 //Wysyła wszystkie logi do serwera a następnie usuwa z lokalnej bazy danych
-const uploadLogsToCloude = async (nameOfLogs) => {
+const uploadLogsToCloud = async (nameOfLogs) => {
     try{
         const data = db.get(nameOfLogs)
         if(data.lenght <= 0){
@@ -51,4 +51,4 @@ const uploadLogsToCloude = async (nameOfLogs) => {
 }
 
 
-module.exports = {sendLogsToCloudeDatabase, uploadLogsToCloude}
+module.exports = {sendLogsToCloudeDatabase, uploadLogsToCloud}

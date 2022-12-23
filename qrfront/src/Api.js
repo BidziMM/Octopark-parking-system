@@ -1,5 +1,9 @@
 import axios from "axios";
-import { tagId,parkingId,lprAuthCode, domain, printServer }  from './Config'
+import Config from './Config'
+
+const {
+  tagId,parkingId,lprAuthCode, domain, printServer, inveoUrl
+} = Config
 
 axios.defaults.withCredentials = false
 
@@ -33,4 +37,29 @@ export const getSession = ({ qrValue }) => {
             'uniqueAuthorisationCodeValue':qrValue
         }
       }).then((res) => res.data)
+}
+
+export const checkHealth = () => {
+  return axios.get(`${domain}/health`)
+}
+
+export const sendLogs = (logs) => {
+  return axios.post(`${domain}/log/collect`,{
+      obj:{
+          'logArray':logs,
+          'logClass':"parking"
+      }
+    }).then((res) => res.data)
+}
+
+export const getSettings = (lprAuthCode) => {
+  return axios.post(`${domain}/settings/slupek/get`,{
+      obj:{
+        lprAuthCode
+      }
+    }).then((res) => res.data)
+}
+
+export const openLocalInveo = () => {
+  return axios.post(`${inveoUrl}`)
 }

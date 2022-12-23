@@ -6,7 +6,7 @@ const {uploadLogsToCloude} = require('../services/sendLogs')
 const isInternet = () => {
     axios ('http://127.0.0.1:8001/health')
     .then(() => {
-        uploadLogsToCloude('terminalLogs')
+        uploadLogsToCloud('terminalLogs')
     })
     .catch(() => {
         console.log("Connection with server lost")

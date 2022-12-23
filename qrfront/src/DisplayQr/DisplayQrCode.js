@@ -3,7 +3,7 @@ import QRCode from "react-qr-code";
 import axios from 'axios';
 import {printRequest, openColumnRequest} from '../Api'
 import {errorPrinter} from '../devTools/requestDev'
-import { bufforTime, qrCodeSize, domain, tagId,parkingId,isEntrance,isOutgoing,mercury, dev } from '../Config'
+import Config from '../Config'
 import QrScanner from './QrScanner';
 import Modal from '../Components/Modal'
 
@@ -13,8 +13,8 @@ function DisplayQrCode({ isOnline }) {
     qrCode:null,
     refreshTime:null,
     loading:true,
-    parkingId:parkingId,
-    tagId:tagId,
+    parkingId:Config.parkingId,
+    tagId:Config.tagId,
     expireTime:null
   })
   const [err, setErr] = useState()
@@ -25,17 +25,17 @@ function DisplayQrCode({ isOnline }) {
     getQrCode();
     setData(prev => ({ ...prev, loading:false }));
   }, [])
-
   useEffect(() => {
+    
     if(data.refreshTime){
         //Start zapytania na serwer co ustalona ilosc czasu
-        myTimer = setInterval(getQrCode, (data.refreshTime * 1000) - bufforTime)
+        myTimer = setInterval(getQrCode, (data.refreshTime * 1000) - Config.bufforTime)
     };
   }, [data.refreshTime])
 
   useEffect(() => {
     //Rozpoczęcie nasłuchiwania na event od serwera
-    const eventSource = new EventSource(mercury + encodeURIComponent(`qr/${data.parkingId}/${data.tagId}/scanned`));
+    const eventSource = new EventSource(Config.mercury + encodeURIComponent(`qr/${data.parkingId}/${data.tagId}/scanned`));
     eventSource.onerror = function(event){
       var txt;
       switch( event.target.readyState ){
@@ -43,7 +43,6 @@ function DisplayQrCode({ isOnline }) {
              txt = 'Reconnecting...';
              break;
       }
-      console.log(txt);
     };
     eventSource.onmessage = event => {
         // Will be called every time an update is published by the server
@@ -75,13 +74,13 @@ function DisplayQrCode({ isOnline }) {
   const clearTimer = () => {
     if(data.refreshTime){
         clearInterval(myTimer);
-        myTimer = setInterval(getQrCode, (data.refreshTime * 1000) - bufforTime);
+        myTimer = setInterval(getQrCode, (data.refreshTime * 1000) - Config.bufforTime);
     };
   }
 
   //Startowa funkcja do pobrania kodu qr i ustawień
   const getSettings = () => {
-    axios.get(`${domain}/app/settings/qrtime`)
+    axios.get(`${Config.domain}/app/settings/qrtime`)
     .then((res) => {
       setData(prev => ({...prev, refreshTime:res.data.generateTime}))
     })
@@ -92,7 +91,7 @@ function DisplayQrCode({ isOnline }) {
 
   const getQrCode = () => {
     //axios.post('http://127.0.0.1:8001/create/current/unique/authorisation/code',{
-    axios.post(`${domain}/generate-qr-code`,{
+    axios.post(`${Config.domain}/generate-qr-code`,{
       obj:{
         parkingId:data.parkingId,
         tagId:data.tagId
@@ -150,10 +149,10 @@ function DisplayQrCode({ isOnline }) {
         <input onChange={(e) => setData(prev => ({...prev, tagId:e.target.value}))} value={data.tagId}className="ml-2 focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none w-1/3 text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md py-2 pl-10 ring-1 ring-slate-200 shadow-sm" type="text"></input>
       */}
       <h3 className='pb-5 font-semibold'>Zeskanuj kod aby rozpocząć sesje</h3>
-      <QRCode value={data.qrCode} size={qrCodeSize}/>
+      <QRCode value={data.qrCode} size={Config.qrCodeSize}/>
       <button disabled={!isOnline} onClick={getQrCode} className={`  `}>Kilijnij aby wygenerować</button>
       <div className='w-full'>
-        {isEntrance && 
+        {Config.isEntrance && 
             <button
               className="flex-none my-4 w-full h-20 px-6 mt-4 rounded-md uppercase font-medium tracking-wider bg-slate-600 text-white"
               type="submit"
@@ -163,7 +162,7 @@ function DisplayQrCode({ isOnline }) {
             </button>
           }
           {
-            dev && 
+            Config.dev && 
               <button
                 className="flex-none my-4 w-full h-20 px-6 mt-4 rounded-md uppercase font-medium tracking-wider bg-slate-600 text-white"
                 type="submit"
@@ -172,7 +171,7 @@ function DisplayQrCode({ isOnline }) {
                 Pobierz bilet error dev
               </button>
           }
-          {isOutgoing && 
+          {Config.isOutgoing && 
             <QrScanner err={err} setErr={setErr}/>
           }
         </div>
